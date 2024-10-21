@@ -1,0 +1,16 @@
+name: gt-archive
+
+services:
+  web:
+    build: web
+    ports:
+      - 8080:80
+    volumes:
+      - ./data/archive:/var/www/html/archive:ro
+
+  updater:
+    build: updater
+    volumes:
+      - ./data:/data
+    environment:
+      - UPDATE_INTERVAL=600  # 10 minutes

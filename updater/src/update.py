@@ -41,7 +41,8 @@ for entry in feed['entries'][::-1]:
     # process url
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
-    if re.search('Kostenfrei bis ..:.. Uhr lesen', soup.find(id='contentMain').text):
+    content = soup.find(id='contentMain')
+    if content and re.search('Kostenfrei bis ..:.. Uhr lesen', content.text):
         # download page
         singlefile = subprocess.run(['npx', 'single-file', '--dump-content', url], capture_output=True)
 

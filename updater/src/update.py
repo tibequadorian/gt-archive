@@ -33,9 +33,11 @@ for entry in feed['entries'][::-1]:
 
     # skip if exists
     url = entry['link']
+    print(f"processing {url}")
     out_filename = url.split('-')[-1]
     out_filepath = f'{data_path}/archive/{out_filename}'
     if os.path.exists(out_filepath):
+        print(f"  {out_filename} already exists, skipping")
         continue
 
     # process url
@@ -55,7 +57,9 @@ for entry in feed['entries'][::-1]:
         with open(out_filepath, 'w', encoding='utf-8') as file:
             file.write(str(soup))
 
-        print(f"Saved {url} to {out_filename}")
+        print(f"  saved to {out_filename}")
+    else:
+        print("  not of interest, skipping")
 
     # update last timestamp
     with open(last_timestamp_filepath, 'w') as last_timestamp_file:

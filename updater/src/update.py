@@ -41,25 +41,24 @@ for entry in feed['entries'][::-1]:
         continue
 
     # process url
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
+    singlefile = subprocess.run(['npx', 'single-file', '--dump-content', url], capture_output=True).stdout
+    soup = BeautifulSoup(singlefile, 'html.parser')
+
+    # detect exclusive access
     content = soup.find(id='contentMain')
     if content and re.search('Kostenfrei bis ..:.. Uhr lesen', content.text):
-        # download page
-        singlefile = subprocess.run(['npx', 'single-file', '--dump-content', url], capture_output=True)
+        print("  exclusive access detected")
 
-        # remove cookie popup
-        soup = BeautifulSoup(singlefile.stdout, 'html.parser')
-        for target_element in soup.find_all(id=re.compile(r'^sp_message_container_\d+$')):
-            target_element.decompose()
+    # remove cookie popup
+    for target_element in soup.find_all(id=re.compile(r'^sp_message_container_\d+$')):
+        target_element.decompose()
+    singlefile = str(soup)
 
-        # save to file
-        with open(out_filepath, 'w', encoding='utf-8') as file:
-            file.write(str(soup))
+    # save to file
+    with open(out_filepath, 'w', encoding='utf-8') as file:
+        file.write(str(soup))
 
-        print(f"  saved to {out_filename}")
-    else:
-        print("  not of interest, skipping")
+    print(f"  saved to {out_filename}")
 
     # update last timestamp
     with open(last_timestamp_filepath, 'w') as last_timestamp_file:
